@@ -1,0 +1,524 @@
+:root {
+    --bg-color: #1E1E2F;
+    --text-color: #EAEAEA;
+    --header-bg: #2B2D42;
+    --accent: #FFD700;
+    --card-bg: rgba(58, 61, 91, 0.45);
+    /* semi-transparent for glass */
+    --card-frost: rgba(255, 255, 255, 0.06);
+    /* subtle inner frost */
+    --card-border: rgba(255, 255, 255, 0.08);
+    --card-hover-bg: rgba(255, 215, 0, 0.95);
+    --card-hover-text: #1E1E2F;
+    --button-hover: #E6C200;
+    --shadow: 0 4px 24px rgba(255, 215, 0, 0.12);
+    --glass-blur: 10px;
+    --glass-card-bg: rgba(255, 255, 255, 0.07);
+    --card-hover-dim: rgba(255, 215, 0, 0.12);
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    /* colorful radial-gradient background similar to the example */
+    background-color: #693e66;
+    background-image: radial-gradient(at 47% 33%, hsl(162.00, 77%, 40%) 0, transparent 59%),
+        radial-gradient(at 82% 65%, hsl(217.41, 100%, 50%) 0, transparent 55%);
+    color: var(--text-color);
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    min-height: 100vh;
+}
+
+header {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid var(--card-border);
+    padding: 2rem 0 1.5rem 0;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+}
+
+/* Header Navigation */
+.main-header {
+    background: transparent;
+    box-shadow: var(--shadow);
+    padding: 0;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem 1.2rem 2rem;
+}
+
+.site-title {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-align: left;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* helper glass class for small containers */
+.glass {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    border: 1px solid var(--card-border);
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+}
+
+/* reusable card (glassmorphism) similar to your example */
+.card {
+    background: var(--glass-card-bg);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
+    padding: 32px;
+    color: #FFFFFF;
+    text-align: left;
+}
+
+.main-nav {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.05rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    background: var(--accent);
+    color: var(--bg-color);
+}
+
+@media (max-width: 700px) {
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.2rem 1rem 1rem 1rem;
+    }
+
+    .main-nav {
+        gap: 0.7rem;
+        flex-wrap: wrap;
+    }
+
+    .site-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* Footer Widgets */
+.main-footer {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    color: var(--text-color);
+    padding: 2.5rem 0 2rem 0;
+    box-shadow: 0 -2px 24px rgba(255, 215, 0, 0.06);
+    margin-top: 2rem;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid var(--card-border);
+}
+
+.footer-widgets {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.footer-widget {
+    flex: 1 1 220px;
+    min-width: 200px;
+    margin-bottom: 1.5rem;
+}
+
+.footer-widget h3 {
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin-bottom: 0.7rem;
+    font-weight: 600;
+}
+
+.footer-widget a {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-widget a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.footer-widget p {
+    margin: 0.3rem 0 0.3rem 0;
+    font-size: 0.98rem;
+    color: var(--text-color);
+}
+
+@media (max-width: 900px) {
+    .footer-widgets {
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+    .tools-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .tools-grid {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        gap: 1rem;
+    }
+}
+
+.tool-card {
+    background: var(--glass-card-bg);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 6px 24px rgba(2, 6, 23, 0.45);
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
+    cursor: pointer;
+    position: relative;
+    min-height: 180px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.7s forwards;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+.tool-card:hover,
+.tool-card:focus {
+    /* dim, subtle hover instead of bright yellow */
+    background: linear-gradient(180deg, var(--card-hover-dim), rgba(255, 215, 0, 0.06));
+    color: var(--text-color);
+    box-shadow: 0 8px 28px rgba(2, 6, 23, 0.38);
+    transform: translateY(-6px) scale(1.02);
+}
+
+/* style the link on each tool card to look like a subtle button */
+.tool-link {
+    display: inline-block;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+    color: var(--text-color);
+    padding: 0.55rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: background 0.18s, transform 0.12s, box-shadow 0.12s;
+}
+
+.tool-link:hover,
+.tool-link:focus {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+/* prominent open button inside modal */
+.open-tool-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg-color);
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    margin-bottom: 1rem;
+}
+
+.open-tool-btn:hover,
+.open-tool-btn:focus {
+    background: #e6b800;
+}
+
+.tool-card h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.tool-card p {
+    flex: 1;
+    margin: 0 0 1.2rem 0;
+    font-size: 1rem;
+    color: inherit;
+}
+
+.tool-card button {
+    background: var(--accent);
+    color: var(--card-hover-text);
+    border: none;
+    border-radius: 5px;
+    padding: 0.7rem 1.5rem;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.08);
+    margin-top: 0.5rem;
+}
+
+.tool-card button:hover,
+.tool-card button:focus {
+    background: var(--button-hover);
+    color: var(--bg-color);
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(30, 30, 47, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.3s;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: var(--glass-card-bg);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: var(--shadow);
+    padding: 2rem 1.5rem;
+    min-width: 320px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    color: var(--text-color);
+    animation: fadeInUp 0.5s;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    /* allow modal content to scroll independently on small screens */
+}
+
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: var(--button-hover);
+}
+
+/* Fade-in animation for cards */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Utility classes */
+.hidden {
+    display: none !important;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--header-bg);
+    border-radius: 8px;
+}
+
+/* Make buttons easy to tap on mobile */
+@media (max-width: 600px) {
+    .tool-card button {
+        width: 100%;
+        font-size: 1.1rem;
+        padding: 1rem 0;
+    }
+
+    .modal-content {
+        padding: 1rem 0.5rem;
+        min-width: 0;
+    }
+}
+
+/* Ad Space Styles */
+.ad-space {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90px;
+    margin: 48px 0 32px 0;
+}
+
+.piki-ads {
+    display: block;
+    width: 728px;
+    height: 90px;
+    background: linear-gradient(180deg, rgba(34, 36, 58, 0.6), rgba(34, 36, 58, 0.45));
+    color: #FFD700;
+    border-radius: 10px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 90px;
+    box-shadow: 0 6px 28px rgba(2, 6, 23, 0.6);
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+
+.piki-ads:hover {
+    background: #FFD700;
+    color: #22243a;
+}
+
+@media (max-width: 800px) {
+    .piki-ads {
+        width: 100%;
+        min-width: 0;
+        font-size: 1.05rem;
+        line-height: 2.5rem;
+        height: auto;
+        padding: 1.2rem 0;
+    }
+
+    .ad-space {
+        min-height: 0;
+        margin: 32px 0 24px 0;
+    }
+}
+
+/* Icon color utility classes used by color-picker.html */
+.icon-accent-pink {
+    color: #f72585;
+}
+
+.icon-accent-cyan {
+    color: #4cc9f0;
+}
+
+.icon-accent-blue {
+    color: #4361ee;
+}
+
+/* Category Styles for Organized Layout */
+.category-section {
+    margin-bottom: 3rem;
+    padding: 0 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.category-title {
+    font-size: 1.8rem;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 600;
+}
+
+.category-title i {
+    font-size: 1.5rem;
+    opacity: 0.9;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.category-grid .tool-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+@media (max-width: 900px) {
+    .category-section {
+        padding: 0 1rem;
+    }
+    
+    .category-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+}

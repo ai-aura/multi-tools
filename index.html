@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi Tool Hub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="header-content glass">
+            <h1 class="site-title">Multi Tool Hub</h1>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="#privacy" class="nav-link">Privacy Policy</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact Us</a>
+                <a href="#disclaimer" class="nav-link">Disclaimer</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section class="tools-grid" id="toolsGrid">
+            <!-- Tool cards will be injected here by JS for modularity -->
+        </section>
+        <div class="ad-space">
+            <a class="piki-ads" href="javascript:;">Your Responsive Ads code (Google Ads)</a>
+        </div>
+        <!-- Modal for tool content -->
+        <div id="toolModal" class="modal hidden">
+            <div class="modal-content">
+                <button class="close-modal" id="closeModalBtn">&times;</button>
+                <div id="modalToolContent"></div>
+            </div>
+        </div>
+    </main>
+    <footer class="main-footer">
+        <div class="footer-widgets">
+            <div class="footer-widget">
+                <h3>Navigation</h3>
+                <a href="index.html">Home</a><br>
+                <a href="#privacy">Privacy Policy</a><br>
+                <a href="#about">About</a><br>
+                <a href="#contact">Contact Us</a><br>
+                <a href="#disclaimer">Disclaimer</a>
+            </div>
+            <div class="footer-widget">
+                <h3>About</h3>
+                <p>Multi Tool Hub is your all-in-one solution for productivity, conversion, and calculation tools. All processing happens locally in your browser for privacy and speed.</p>
+            </div>
+            <div class="footer-widget">
+                <h3>Contact</h3>
+                <p>Email: <a href="mailto:support@multitoolhub.com">support@multitoolhub.com</a></p>
+                <p>&copy; 2023 Multi Tool Hub</p>
+            </div>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+
+</html>

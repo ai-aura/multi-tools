@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Minifier - HTML, CSS, JavaScript</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #f72585;
+            --success: #06d6a0;
+            --dark: #1e1e2c;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border: #e2e8f0;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .tool-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .tool-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .tool-icon {
+            font-size: 1.8rem;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tool-title { font-size: 1.4rem; font-weight: 600; }
+        .tool-body { padding: 25px; }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--gray);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .editor-container { grid-template-columns: 1fr; }
+        }
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+        }
+        .section-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .char-count {
+            font-size: 0.85rem;
+            color: var(--gray);
+            font-weight: normal;
+        }
+        .code-editor {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            min-height: 350px;
+            background: white;
+            resize: vertical;
+            overflow: auto;
+            line-height: 1.5;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .btn-success { background: var(--success); }
+        .btn-success:hover { background: #05b890; }
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background: var(--light);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+        .options {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light);
+            border-radius: var(--radius);
+            flex-wrap: wrap;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .option-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .option-item label {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        /* Ad Container */
+        .ad-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tool-card">
+            <div class="tool-header">
+                <div class="tool-icon">
+                    <i class="fas fa-compress-alt"></i>
+                </div>
+                <div>
+                    <h1 class="tool-title">Code Minifier</h1>
+                    <p style="opacity: 0.9; font-size: 0.95rem;">Minify HTML, CSS, and JavaScript code offline</p>
+                </div>
+            </div>
+            
+            <div class="tool-body">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('html')">HTML</button>
+                    <button class="tab-btn" onclick="switchTab('css')">CSS</button>
+                    <button class="tab-btn" onclick="switchTab('js')">JavaScript</button>
+                </div>
+                
+                <div class="options" id="htmlOptions" style="display: flex;">
+                    <div class="option-item">
+                        <input type="checkbox" id="removeComments" checked>
+                        <label for="removeComments">Remove comments</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="checkbox" id="removeWhitespace" checked>
+                        <label for="removeWhitespace">Remove whitespace</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="checkbox" id="removeEmptyAttributes">
+                        <label for="removeEmptyAttributes">Remove empty attributes</label>
+                    </div>
+                </div>
+                
+                <div class="options" id="cssOptions" style="display: none;">
+                    <div class="option-item">
+                        <input type="checkbox" id="cssRemoveComments" checked>
+                        <label for="cssRemoveComments">Remove comments</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="checkbox" id="cssRemoveWhitespace" checked>
+                        <label for="cssRemoveWhitespace">Remove whitespace</label>
+                    </div>
+                </div>
+                
+                <div class="options" id="jsOptions" style="display: none;">
+                    <div class="option-item">
+                        <input type="checkbox" id="jsRemoveComments" checked>
+                        <label for="jsRemoveComments">Remove comments</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="checkbox" id="jsRemoveWhitespace" checked>
+                        <label for="jsRemoveWhitespace">Remove whitespace</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="checkbox" id="jsMangleVariables">
+                        <label for="jsMangleVariables">Simple variable shortening</label>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" onclick="minifyCode()">
+                        <i class="fas fa-compress"></i> Minify Code
+                    </button>
+                    <button class="btn btn-success" onclick="copyResult()">
+                        <i class="fas fa-copy"></i> Copy Result
+                    </button>
+                    <button class="btn" onclick="clearAll()">
+                        <i class="fas fa-trash"></i> Clear All
+                    </button>
+                </div>
+                
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-value" id="originalSize">0</div>
+                        <div class="stat-label">Original (bytes)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="minifiedSize">0</div>
+                        <div class="stat-label">Minified (bytes)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="savings">0%</div>
+                        <div class="stat-label">Size Reduction</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="compressionRatio">0x</div>
+                        <div class="stat-label">Compression Ratio</div>
+                    </div>
+                </div>
+                
+                <div class="editor-container">
+                    <div class="editor-section">
+                        <label class="section-label">
+                            Original Code:
+                            <span class="char-count" id="inputCount">0 characters</span>
+                        </label>
+                        <textarea class="code-editor" id="inputCode" placeholder="Paste your code here..."></textarea>
+                    </div>
+                    <div class="editor-section">
+                        <label class="section-label">
+                            Minified Result:
+                            <span class="char-count" id="outputCount">0 characters</span>
+                        </label>
+                        <textarea class="code-editor" id="outputCode" readonly placeholder="Minified code will appear here..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- Ad Integration -->
+                <div class="ad-container">
+                    <script type="text/javascript">
+                        atOptions = {
+                          'key' : 'b45e8fcc4b15142e0654ee06d1a2ea5c',
+                          'format' : 'iframe',
+                          'height' : 60,
+                          'width' : 468,
+                          'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//tinysentgrowled.com/b45e8fcc4b15142e0654ee06d1a2ea5c/invoke.js"></script>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentTab = 'html';
+        
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase() === tab || 
+                    (tab === 'js' && btn.textContent === 'JavaScript')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Show/hide options
+            document.getElementById('htmlOptions').style.display = tab === 'html' ? 'flex' : 'none';
+            document.getElementById('cssOptions').style.display = tab === 'css' ? 'flex' : 'none';
+            document.getElementById('jsOptions').style.display = tab === 'js' ? 'flex' : 'none';
+            
+            // Clear editors
+            clearAll();
+        }
+        
+        function minifyHTML(html) {
+            const removeComments = document.getElementById('removeComments').checked;
+            const removeWhitespace = document.getElementById('removeWhitespace').checked;
+            const removeEmptyAttributes = document.getElementById('removeEmptyAttributes').checked;
+            
+            let minified = html;
+            
+            if (removeComments) {
+                minified = minified.replace(/<!--[\s\S]*?-->/g, '');
+            }
+            
+            if (removeWhitespace) {
+                minified = minified.replace(/\s+/g, ' ');
+                minified = minified.replace(/>\s+</g, '><');
+                minified = minified.replace(/\s+>/g, '>');
+                minified = minified.replace(/<\s+/g, '<');
+            }
+            
+            if (removeEmptyAttributes) {
+                minified = minified.replace(/\s+[a-zA-Z-]+=""/g, '');
+            }
+            
+            return minified.trim();
+        }
+        
+        function minifyCSS(css) {
+            const removeComments = document.getElementById('cssRemoveComments').checked;
+            const removeWhitespace = document.getElementById('cssRemoveWhitespace').checked;
+            
+            let minified = css;
+            
+            if (removeComments) {
+                minified = minified.replace(/\/\*[\s\S]*?\*\//g, '');
+            }
+            
+            if (removeWhitespace) {
+                minified = minified.replace(/\s+/g, ' ');
+                minified = minified.replace(/\s*:\s*/g, ':');
+                minified = minified.replace(/\s*;\s*/g, ';');
+                minified = minified.replace(/\s*{\s*/g, '{');
+                minified = minified.replace(/\s*}\s*/g, '}');
+                minified = minified.replace(/\s*,\s*/g, ',');
+                minified = minified.replace(/;\}/g, '}');
+            }
+            
+            return minified.trim();
+        }
+        
+        function minifyJS(js) {
+            const removeComments = document.getElementById('jsRemoveComments').checked;
+            const removeWhitespace = document.getElementById('jsRemoveWhitespace').checked;
+            const mangleVariables = document.getElementById('jsMangleVariables').checked;
+            
+            let minified = js;
+            
+            if (removeComments) {
+                // Remove single line comments
+                minified = minified.replace(/\/\/.*$/gm, '');
+                // Remove multi-line comments
+                minified = minified.replace(/\/\*[\s\S]*?\*\//g, '');
+            }
+            
+            if (removeWhitespace) {
+                // Remove unnecessary whitespace
+                minified = minified.replace(/\s+/g, ' ');
+                minified = minified.replace(/\s*([{}();,:])\s*/g, '$1');
+                minified = minified.replace(/;\s*}/g, '}');
+                
+                // Remove whitespace around operators
+                minified = minified.replace(/\s*([+\-*/%=<>!&|])\s*/g, '$1');
+                
+                // Fix some cases that break
+                minified = minified.replace(/}var/g, '} var');
+                minified = minified.replace(/}function/g, '} function');
+                minified = minified.replace(/}if/g, '} if');
+                minified = minified.replace(/}for/g, '} for');
+                minified = minified.replace(/}while/g, '} while');
+                minified = minified.replace(/}return/g, '} return');
+                minified = minified.replace(/else{/g, 'else {');
+            }
+            
+            if (mangleVariables) {
+                // Simple variable shortening (very basic, not production-ready)
+                const varMap = {};
+                let varCounter = 0;
+                const shortNames = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                
+                // Find and replace let, const, var declarations
+                minified = minified.replace(/\b(let|const|var)\s+([a-zA-Z_][a-zA-Z0-9_]*)/g, (match, keyword, varName) => {
+                    if (!varMap[varName] && varCounter < shortNames.length) {
+                        varMap[varName] = shortNames[varCounter++];
+                    }
+                    return varMap[varName] ? `${keyword} ${varMap[varName]}` : match;
+                });
+                
+                // Replace variable usages
+                Object.keys(varMap).forEach(original => {
+                    const regex = new RegExp(`\\b${original}\\b`, 'g');
+                    minified = minified.replace(regex, varMap[original]);
+                });
+            }
+            
+            return minified.trim();
+        }
+        
+        function minifyCode() {
+            const input = document.getElementById('inputCode').value;
+            const output = document.getElementById('outputCode');
+            
+            if (!input.trim()) {
+                alert('Please enter some code to minify');
+                return;
+            }
+            
+            let minified = '';
+            
+            switch (currentTab) {
+                case 'html':
+                    minified = minifyHTML(input);
+                    break;
+                case 'css':
+                    minified = minifyCSS(input);
+                    break;
+                case 'js':
+                    minified = minifyJS(input);
+                    break;
+            }
+            
+            output.value = minified;
+            updateStats();
+        }
+        
+        function updateStats() {
+            const input = document.getElementById('inputCode').value;
+            const output = document.getElementById('outputCode').value;
+            
+            const originalSize = input.length;
+            const minifiedSize = output.length;
+            const savings = originalSize > 0 ? Math.round((1 - minifiedSize / originalSize) * 100) : 0;
+            const ratio = originalSize > 0 ? (originalSize / minifiedSize).toFixed(2) : 0;
+            
+            document.getElementById('originalSize').textContent = originalSize.toLocaleString();
+            document.getElementById('minifiedSize').textContent = minifiedSize.toLocaleString();
+            document.getElementById('savings').textContent = savings + '%';
+            document.getElementById('compressionRatio').textContent = ratio + 'x';
+            
+            document.getElementById('inputCount').textContent = originalSize.toLocaleString() + ' characters';
+            document.getElementById('outputCount').textContent = minifiedSize.toLocaleString() + ' characters';
+        }
+        
+        function copyResult() {
+            const output = document.getElementById('outputCode');
+            if (output.value) {
+                output.select();
+                document.execCommand('copy');
+                alert('Minified code copied to clipboard!');
+            } else {
+                alert('No minified code to copy');
+            }
+        }
+        
+        function clearAll() {
+            document.getElementById('inputCode').value = '';
+            document.getElementById('outputCode').value = '';
+            updateStats();
+        }
+        
+        // Update character count on input
+        document.getElementById('inputCode').addEventListener('input', function() {
+            document.getElementById('inputCount').textContent = this.value.length.toLocaleString() + ' characters';
+        });
+    </script>
+</body>
+</html>

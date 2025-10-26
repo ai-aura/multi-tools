@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <style>
+        :root { --primary: #4361ee; --quaternary: #ffd166; --dark: #1e1e2c; --light: #f8f9fa; --gray: #6c757d; --border: #e2e8f0; --shadow: 0 10px 20px rgba(0, 0, 0, 0.05); --radius: 12px; --transition: all 0.3s ease; }
+        body { background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%); color: var(--dark); min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center; }
+        .container { max-width: 500px; width: 100%; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(to right, var(--primary), var(--quaternary)); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 10px; }
+        header p { color: var(--gray); font-size: 1.1rem; max-width: 600px; margin: 0 auto 20px; }
+        .tool-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 25px; transition: var(--transition); }
+        .tool-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .tool-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: rgba(255, 209, 102, 0.1); color: var(--quaternary); }
+        .tool-title { font-size: 1.4rem; font-weight: 700; }
+        .tool-description { color: var(--gray); font-size: 0.95rem; margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--dark); }
+        .select-box, .input-box { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border); background: white; font-size: 1rem; color: var(--dark); transition: var(--transition); }
+        .select-box:focus, .input-box:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2); }
+        .btn { background: var(--quaternary); color: var(--dark); border: none; padding: 12px 20px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center; }
+        .btn:hover { background: #ffe082; transform: translateY(-2px); }
+        .btn-secondary { background: var(--primary); color: white; }
+        .btn-secondary:hover { background: #3a56d4; }
+        .result-container { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: var(--radius); display: none; }
+        .result-container.active { display: block; }
+        .result-title { font-weight: 600; margin-bottom: 10px; color: var(--dark); display: flex; align-items: center; gap: 8px; }
+        .qr-code-container { display: flex; justify-content: center; margin: 15px 0; }
+        #qrcode { padding: 10px; background: white; border-radius: 8px; }
+        footer { text-align: center; margin-top: 40px; color: var(--gray); font-size: 0.9rem; }
+        @media (max-width: 600px) {
+            .container { max-width: 100%; }
+        }
+
+        /* Ad Space Styles */
+        .ad-space {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90px;
+            margin: 32px 0 32px 0;
+        }
+        .piki-ads {
+            display: block;
+            width: 728px;
+            height: 90px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 90px;
+            box-shadow: 0 2px 16px rgba(67,97,238,0.08);
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .piki-ads:hover {
+            background: var(--secondary);
+            color: #fff;
+        }
+        @media (max-width: 800px) {
+            .piki-ads {
+                width: 100%;
+                min-width: 0;
+                font-size: 1.05rem;
+                line-height: 2.5rem;
+                height: auto;
+                padding: 1.2rem 0;
+            }
+            .ad-space {
+                min-height: 0;
+                margin: 24px 0 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-qrcode"></i> QR Code Generator</h1>
+            <p>Create QR codes for URLs, text, contact information, and more.</p>
+        </header>
+        <div class="ad-space">
+          <a class='piki-ads' href="javascript:;">Your Responsive Ads code (Google Ads)</a>
+        </div>
+        <div class="tool-card">
+            <div class="tool-header">
+                <div class="tool-icon"><i class="fas fa-qrcode"></i></div>
+                <h2 class="tool-title">QR Code Generator</h2>
+            </div>
+            <p class="tool-description">Create QR codes for URLs, text, contact information, and more.</p>
+            <div class="form-group">
+                <label for="qr-content">Content for QR Code</label>
+                <input type="text" id="qr-content" class="input-box" placeholder="Enter URL or text" value="https://example.com">
+            </div>
+            <div class="form-group">
+                <label for="qr-size">QR Code Size</label>
+                <select id="qr-size" class="select-box">
+                    <option value="200">Small (200x200)</option>
+                    <option value="250" selected>Medium (250x250)</option>
+                    <option value="300">Large (300x300)</option>
+                </select>
+            </div>
+            <button class="btn" id="generate-qr-btn"><i class="fas fa-qrcode"></i> Generate QR Code</button>
+            <div class="result-container" id="qr-result">
+                <div class="result-title"><i class="fas fa-qrcode"></i> Your QR Code</div>
+                <div class="qr-code-container"><div id="qrcode"></div></div>
+                <button class="btn btn-secondary" id="download-qr-btn"><i class="fas fa-download"></i> Download QR Code</button>
+            </div>
+        </div>
+        <footer>
+            <p>QR Code Generator &copy; 2023 | All processing happens locally in your browser</p>
+        </footer>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const qrContent = document.getElementById('qr-content');
+            const qrSize = document.getElementById('qr-size');
+            const generateQrBtn = document.getElementById('generate-qr-btn');
+            const downloadQrBtn = document.getElementById('download-qr-btn');
+            const qrResult = document.getElementById('qr-result');
+            const qrcodeDiv = document.getElementById('qrcode');
+            generateQrBtn.addEventListener('click', () => {
+                const content = qrContent.value.trim();
+                const size = parseInt(qrSize.value);
+                if (!content) { alert("Please enter content for QR code"); return; }
+                qrcodeDiv.innerHTML = '';
+                new QRCode(qrcodeDiv, { text: content, width: size, height: size, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
+                qrResult.classList.add('active');
+            });
+            downloadQrBtn.addEventListener('click', () => {
+                if (qrcodeDiv.children.length === 0) { alert("Please generate a QR code first"); return; }
+                const canvas = qrcodeDiv.querySelector('canvas');
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+            generateQrBtn.click();
+        });
+    </script>
+</body>
+</html> 

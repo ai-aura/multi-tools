@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 Encoder/Decoder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #06d6a0;
+            --accent: #f72585;
+            --dark: #1e1e2c;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border: #e2e8f0;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .tool-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .tool-header {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .tool-icon {
+            font-size: 1.8rem;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tool-title { font-size: 1.4rem; font-weight: 600; }
+        .tool-body { padding: 25px; }
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--light);
+            padding: 5px;
+            border-radius: var(--radius);
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--gray);
+        }
+        .mode-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        .section-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .input-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            resize: vertical;
+            transition: var(--transition);
+        }
+        .input-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67,97,238,0.1);
+        }
+        .file-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 30px;
+            text-align: center;
+            background: var(--light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+        .file-upload-area.drag-over {
+            border-color: var(--primary);
+            background: rgba(67,97,238,0.05);
+        }
+        .file-input {
+            display: none;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: var(--secondary);
+        }
+        .btn-secondary:hover {
+            background: #05b890;
+        }
+        .output-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--light);
+            border-radius: var(--radius);
+            display: none;
+        }
+        .output-section.active {
+            display: block;
+        }
+        .output-text {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            word-break: break-all;
+            max-height: 300px;
+            overflow: auto;
+            border: 1px solid var(--border);
+        }
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .file-icon {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        .file-details {
+            flex: 1;
+        }
+        .file-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .file-size {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* Ad Container */
+        .ad-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tool-card">
+            <div class="tool-header">
+                <div class="tool-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div>
+                    <h1 class="tool-title">Base64 Encoder/Decoder</h1>
+                    <p style="opacity: 0.9; font-size: 0.95rem;">Convert text and files to/from Base64 encoding</p>
+                </div>
+            </div>
+            
+            <div class="tool-body">
+                <div class="mode-selector">
+                    <button class="mode-btn active" onclick="switchMode('encode')">
+                        <i class="fas fa-lock"></i> Encode
+                    </button>
+                    <button class="mode-btn" onclick="switchMode('decode')">
+                        <i class="fas fa-unlock"></i> Decode
+                    </button>
+                </div>
+                
+                <div class="input-section">
+                    <label class="section-label">
+                        <i class="fas fa-keyboard"></i>
+                        <span id="inputLabel">Text to Encode:</span>
+                    </label>
+                    <textarea class="input-textarea" id="textInput" placeholder="Enter text here..."></textarea>
+                    
+                    <div style="text-align: center; margin: 15px 0; color: var(--gray); font-weight: 600;">
+                        — OR —
+                    </div>
+                    
+                    <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;"></i>
+                        <p style="font-weight: 600; margin-bottom: 5px;">Drop file here or click to browse</p>
+                        <p style="font-size: 0.9rem; color: var(--gray);">Supports any file type for encoding</p>
+                        <input type="file" id="fileInput" class="file-input" onchange="handleFileSelect(event)">
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" id="processBtn" onclick="processData()">
+                        <i class="fas fa-play"></i> <span id="processBtnText">Encode</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="copyOutput()" id="copyBtn" style="display: none;">
+                        <i class="fas fa-copy"></i> Copy Result
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadResult()" id="downloadBtn" style="display: none;">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="btn" onclick="clearAll()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+                
+                <!-- Ad Integration -->
+                <div class="ad-container">
+                    <script type="text/javascript">
+                        atOptions = {
+                          'key' : 'b45e8fcc4b15142e0654ee06d1a2ea5c',
+                          'format' : 'iframe',
+                          'height' : 60,
+                          'width' : 468,
+                          'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//tinysentgrowled.com/b45e8fcc4b15142e0654ee06d1a2ea5c/invoke.js"></script>
+                </div>
+                
+                <div class="output-section" id="outputSection">
+                    <label class="section-label">
+                        <i class="fas fa-check-circle" style="color: var(--secondary);"></i>
+                        Result:
+                    </label>
+                    <div class="output-text" id="outputText"></div>
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <i class="fas fa-file file-icon"></i>
+                        <div class="file-details">
+                            <div class="file-name" id="fileName"></div>
+                            <div class="file-size" id="fileSize"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentMode = 'encode';
+        let currentFile = null;
+        let resultData = '';
+        
+        // Setup drag and drop
+        const uploadArea = document.querySelector('.file-upload-area');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.mode-btn').classList.add('active');
+            
+            // Update labels
+            document.getElementById('inputLabel').textContent = mode === 'encode' ? 'Text to Encode:' : 'Base64 to Decode:';
+            document.getElementById('textInput').placeholder = mode === 'encode' ? 'Enter text here...' : 'Enter Base64 string here...';
+            document.getElementById('processBtnText').textContent = mode === 'encode' ? 'Encode' : 'Decode';
+            
+            clearAll();
+        }
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+        
+        function handleFile(file) {
+            currentFile = file;
+            document.getElementById('textInput').value = `File selected: ${file.name}`;
+            document.getElementById('textInput').disabled = true;
+        }
+        
+        function processData() {
+            const textInput = document.getElementById('textInput').value;
+            
+            if (currentFile) {
+                // Process file
+                const reader = new FileReader();
+                
+                if (currentMode === 'encode') {
+                    reader.onload = function(e) {
+                        const arrayBuffer = e.target.result;
+                        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+                        displayResult(base64, currentFile.name, currentFile.size);
+                    };
+                    reader.readAsArrayBuffer(currentFile);
+                } else {
+                    alert('File decoding not supported. Please paste Base64 text instead.');
+                    clearAll();
+                }
+            } else if (textInput) {
+                // Process text
+                if (currentMode === 'encode') {
+                    try {
+                        const encoded = btoa(unescape(encodeURIComponent(textInput)));
+                        displayResult(encoded);
+                    } catch (e) {
+                        alert('Error encoding text. Please check your input.');
+                    }
+                } else {
+                    try {
+                        const decoded = decodeURIComponent(escape(atob(textInput.replace(/\s/g, ''))));
+                        displayResult(decoded);
+                    } catch (e) {
+                        alert('Invalid Base64 string. Please check your input.');
+                    }
+                }
+            } else {
+                alert('Please enter text or select a file');
+            }
+        }
+        
+        function displayResult(result, fileName = null, fileSize = null) {
+            resultData = result;
+            
+            const outputSection = document.getElementById('outputSection');
+            const outputText = document.getElementById('outputText');
+            const fileInfo = document.getElementById('fileInfo');
+            
+            outputText.textContent = result;
+            outputSection.classList.add('active');
+            
+            if (fileName) {
+                document.getElementById('fileName').textContent = fileName;
+                document.getElementById('fileSize').textContent = formatFileSize(fileSize) + ' → ' + formatFileSize(result.length);
+                fileInfo.style.display = 'flex';
+            } else {
+                fileInfo.style.display = 'none';
+            }
+            
+            document.getElementById('copyBtn').style.display = 'inline-flex';
+            document.getElementById('downloadBtn').style.display = 'inline-flex';
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+        
+        function copyOutput() {
+            navigator.clipboard.writeText(resultData).then(() => {
+                alert('Result copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = resultData;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Result copied to clipboard!');
+            });
+        }
+        
+        function downloadResult() {
+            const blob = new Blob([resultData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = currentMode === 'encode' ? 'encoded.txt' : 'decoded.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function clearAll() {
+            document.getElementById('textInput').value = '';
+            document.getElementById('textInput').disabled = false;
+            document.getElementById('outputSection').classList.remove('active');
+            document.getElementById('copyBtn').style.display = 'none';
+            document.getElementById('downloadBtn').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+            currentFile = null;
+            resultData = '';
+        }
+    </script>
+</body>
+</html>

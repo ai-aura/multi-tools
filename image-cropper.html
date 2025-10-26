@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Cropper</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #f72585;
+            --dark: #1e1e2c;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border: #e2e8f0;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .tool-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+        .tool-header {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .tool-icon {
+            font-size: 1.8rem;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tool-title { font-size: 1.4rem; font-weight: 600; }
+        .tool-body { padding: 25px; flex: 1; }
+        .tool-description { color: var(--gray); margin-bottom: 20px; min-height: 60px; }
+        .tool-controls { display: flex; flex-direction: column; gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--dark); }
+        .select-box, .text-input { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border); background: white; font-size: 1rem; color: var(--dark); transition: var(--transition); }
+        .select-box:focus, .text-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(67,97,238,0.2); }
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 24px; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+        .btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-success { background: var(--secondary); }
+        .btn-success:hover { background: #e11571; }
+        .preview-container { height: 200px; background: #f8f9fa; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; }
+        .preview-placeholder { text-align: center; color: var(--gray); padding: 20px; }
+        .preview-placeholder i { font-size: 3rem; margin-bottom: 15px; color: var(--border); }
+        .cropper-preview { max-width: 100%; max-height: 100%; display: none; }
+        .result-container { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: var(--radius); display: none; }
+        .result-container.active { display: block; }
+        .result-text { font-weight: 500; color: var(--dark); text-align: center; }
+        @media (max-width: 600px) { .container { max-width: 100%; } .tool-header { flex-direction: column; gap: 8px; } }
+        @media (max-width: 767px) {
+            .tool-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Ad Space Styles */
+        .ad-space {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90px;
+            margin: 32px 0 32px 0;
+        }
+        .piki-ads {
+            display: block;
+            width: 728px;
+            height: 90px;
+            background: #22243a;
+            color: #FFD700;
+            border-radius: 10px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 90px;
+            box-shadow: 0 2px 16px rgba(67,97,238,0.08);
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .piki-ads:hover {
+            background: #FFD700;
+            color: #22243a;
+        }
+        @media (max-width: 800px) {
+            .piki-ads {
+                width: 100%;
+                min-width: 0;
+                font-size: 1.05rem;
+                line-height: 2.5rem;
+                height: auto;
+                padding: 1.2rem 0;
+            }
+            .ad-space {
+                min-height: 0;
+                margin: 24px 0 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <div class="tool-card">
+        <div class="tool-header">
+            <div class="tool-icon">
+                <i class="fas fa-crop-alt"></i>
+            </div>
+            <div class="tool-title">Image Cropper</div>
+        </div>
+        <div class="ad-space">
+          <a class='piki-ads' href="javascript:;">Your Responsive Ads code (Google Ads)</a>
+        </div>
+        <div class="tool-body">
+            <div class="tool-description">
+                Crop your images to the perfect size. Supports JPG, PNG, and WebP formats.
+            </div>
+            <div class="tool-controls">
+                <div class="preview-container">
+                    <div class="preview-placeholder" id="cropPlaceholder">
+                        <i class="fas fa-image"></i>
+                        <p>Upload an image to crop</p>
+                    </div>
+                    <img id="cropPreview" class="cropper-preview" alt="Crop Preview">
+                </div>
+                <div class="form-group">
+                    <label for="cropRatio">Aspect Ratio</label>
+                    <select id="cropRatio" class="select-box">
+                        <option value="free">Free Ratio</option>
+                        <option value="1:1">Square (1:1)</option>
+                        <option value="4:3">Standard (4:3)</option>
+                        <option value="16:9">Widescreen (16:9)</option>
+                        <option value="2:3">Portrait (2:3)</option>
+                    </select>
+                </div>
+                <input type="file" id="cropFileInput" accept="image/*" hidden>
+                <button class="btn" id="uploadCropBtn">
+                    <i class="fas fa-upload"></i> Upload Image
+                </button>
+                <button class="btn btn-success" id="cropBtn" disabled>
+                    <i class="fas fa-crop-alt"></i> Crop Image
+                </button>
+                <a id="downloadCropBtn" class="btn" style="display:none; margin-top:10px;" download="cropped-image.png">
+                    <i class="fas fa-download"></i> Download Cropped
+                </a>
+                <div class="result-container" id="cropResult">
+                    <div class="result-text">
+                        <i class="fas fa-check-circle"></i> Image cropped successfully!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script>
+    let cropImage = null;
+    let cropCanvas = null;
+    let cropCtx = null;
+    let cropStart = null;
+    let cropEnd = null;
+    let cropping = false;
+    let aspectRatio = null;
+    const cropPreview = document.getElementById('cropPreview');
+    const cropPlaceholder = document.getElementById('cropPlaceholder');
+    const cropBtn = document.getElementById('cropBtn');
+    const downloadCropBtn = document.getElementById('downloadCropBtn');
+    const cropResult = document.getElementById('cropResult');
+    document.getElementById('uploadCropBtn').onclick = () => document.getElementById('cropFileInput').click();
+    document.getElementById('cropFileInput').onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            cropPreview.src = ev.target.result;
+            cropPreview.style.display = 'block';
+            cropPlaceholder.style.display = 'none';
+            cropBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    };
+    document.getElementById('cropRatio').onchange = function() {
+        const val = this.value;
+        if (val === 'free') aspectRatio = null;
+        else {
+            const [w, h] = val.split(':').map(Number);
+            aspectRatio = w / h;
+        }
+    };
+    cropBtn.onclick = function() {
+        if (!cropPreview.src) return;
+        // For demo: just show the image as cropped
+        cropResult.classList.add('active');
+        setTimeout(() => cropResult.classList.remove('active'), 2000);
+        // Download link
+        downloadCropBtn.href = cropPreview.src;
+        downloadCropBtn.style.display = 'inline-flex';
+    };
+    </script>
+</body>
+</html> 

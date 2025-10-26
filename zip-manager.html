@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZIP File Manager - Create & Extract ZIP Files</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #06d6a0;
+            --accent: #f72585;
+            --dark: #1e1e2c;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border: #e2e8f0;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .tool-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .tool-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .tool-icon {
+            font-size: 1.8rem;
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tool-title { font-size: 1.4rem; font-weight: 600; }
+        .tool-body { padding: 25px; }
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--gray);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            text-align: center;
+            background: var(--light);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 20px;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--primary);
+            background: white;
+        }
+        .drop-zone i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        .file-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 15px;
+            background: white;
+            margin-bottom: 20px;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: var(--light);
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .file-item:last-child {
+            margin-bottom: 0;
+        }
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        .file-icon {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        .file-name {
+            font-weight: 500;
+            word-break: break-all;
+        }
+        .file-size {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        .file-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .action-btn {
+            padding: 5px 10px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: var(--secondary);
+        }
+        .btn-secondary:hover {
+            background: #05b890;
+        }
+        .btn-danger {
+            background: var(--accent);
+        }
+        .btn-danger:hover {
+            background: #e11571;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .status-message {
+            padding: 12px;
+            border-radius: var(--radius);
+            margin-top: 20px;
+            display: none;
+        }
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        /* Ad Container */
+        .ad-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tool-card">
+            <div class="tool-header">
+                <div class="tool-icon">
+                    <i class="fas fa-file-archive"></i>
+                </div>
+                <div>
+                    <h1 class="tool-title">ZIP File Manager</h1>
+                    <p style="opacity: 0.9; font-size: 0.95rem;">Create and extract ZIP files directly in your browser</p>
+                </div>
+            </div>
+            
+            <div class="tool-body">
+                <div class="tab-container">
+                    <button class="tab-btn active" onclick="switchTab('create')">
+                        <i class="fas fa-compress"></i> Create ZIP
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('extract')">
+                        <i class="fas fa-expand"></i> Extract ZIP
+                    </button>
+                </div>
+                
+                <!-- Create ZIP Tab -->
+                <div class="tab-content active" id="createTab">
+                    <div class="drop-zone" onclick="document.getElementById('createFiles').click()" id="createDropZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p style="font-weight: 600; margin-bottom: 5px;">Drop files here or click to browse</p>
+                        <p style="font-size: 0.9rem; color: var(--gray);">Select multiple files to add to ZIP</p>
+                        <input type="file" id="createFiles" multiple style="display: none;" onchange="handleCreateFiles(event)">
+                    </div>
+                    
+                    <div class="file-list" id="createFileList" style="display: none;">
+                        <h3 style="margin-bottom: 15px;">Files to compress:</h3>
+                        <div id="createFileItems"></div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button class="btn" onclick="createZip()" id="createBtn" disabled>
+                            <i class="fas fa-file-archive"></i> Create ZIP
+                        </button>
+                        <button class="btn btn-danger" onclick="clearCreateFiles()">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Extract ZIP Tab -->
+                <div class="tab-content" id="extractTab">
+                    <div class="drop-zone" onclick="document.getElementById('extractFile').click()" id="extractDropZone">
+                        <i class="fas fa-file-archive"></i>
+                        <p style="font-weight: 600; margin-bottom: 5px;">Drop ZIP file here or click to browse</p>
+                        <p style="font-size: 0.9rem; color: var(--gray);">Select a ZIP file to extract</p>
+                        <input type="file" id="extractFile" accept=".zip" style="display: none;" onchange="handleExtractFile(event)">
+                    </div>
+                    
+                    <div class="file-list" id="extractFileList" style="display: none;">
+                        <h3 style="margin-bottom: 15px;">ZIP Contents:</h3>
+                        <div id="extractFileItems"></div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button class="btn" onclick="extractAll()" id="extractAllBtn" disabled>
+                            <i class="fas fa-download"></i> Extract All
+                        </button>
+                        <button class="btn btn-danger" onclick="clearExtractFiles()">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Ad Integration -->
+                <div class="ad-container">
+                    <script type="text/javascript">
+                        atOptions = {
+                          'key' : 'b45e8fcc4b15142e0654ee06d1a2ea5c',
+                          'format' : 'iframe',
+                          'height' : 60,
+                          'width' : 468,
+                          'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//tinysentgrowled.com/b45e8fcc4b15142e0654ee06d1a2ea5c/invoke.js"></script>
+                </div>
+                
+                <div class="status-message" id="statusMessage"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let createFilesList = [];
+        let extractedZip = null;
+        
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (tab === 'create') {
+                document.querySelector('.tab-btn').classList.add('active');
+                document.getElementById('createTab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('extractTab').classList.add('active');
+            }
+        }
+        
+        // Drag and drop for create
+        const createDropZone = document.getElementById('createDropZone');
+        createDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            createDropZone.classList.add('dragover');
+        });
+        createDropZone.addEventListener('dragleave', () => {
+            createDropZone.classList.remove('dragover');
+        });
+        createDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            createDropZone.classList.remove('dragover');
+            handleCreateFiles({ target: { files: e.dataTransfer.files } });
+        });
+        
+        // Drag and drop for extract
+        const extractDropZone = document.getElementById('extractDropZone');
+        extractDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            extractDropZone.classList.add('dragover');
+        });
+        extractDropZone.addEventListener('dragleave', () => {
+            extractDropZone.classList.remove('dragover');
+        });
+        extractDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            extractDropZone.classList.remove('dragover');
+            handleExtractFile({ target: { files: e.dataTransfer.files } });
+        });
+        
+        // Handle files for creating ZIP
+        function handleCreateFiles(event) {
+            const files = Array.from(event.target.files);
+            createFilesList.push(...files);
+            displayCreateFiles();
+            document.getElementById('createBtn').disabled = createFilesList.length === 0;
+        }
+        
+        function displayCreateFiles() {
+            const container = document.getElementById('createFileItems');
+            const fileList = document.getElementById('createFileList');
+            
+            if (createFilesList.length === 0) {
+                fileList.style.display = 'none';
+                return;
+            }
+            
+            fileList.style.display = 'block';
+            container.innerHTML = '';
+            
+            createFilesList.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <i class="fas fa-file file-icon"></i>
+                        <div>
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${formatFileSize(file.size)}</div>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="action-btn" onclick="removeCreateFile(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(fileItem);
+            });
+        }
+        
+        function removeCreateFile(index) {
+            createFilesList.splice(index, 1);
+            displayCreateFiles();
+            document.getElementById('createBtn').disabled = createFilesList.length === 0;
+        }
+        
+        function clearCreateFiles() {
+            createFilesList = [];
+            displayCreateFiles();
+            document.getElementById('createBtn').disabled = true;
+            document.getElementById('createFiles').value = '';
+        }
+        
+        // Create ZIP
+        async function createZip() {
+            const zip = new JSZip();
+            
+            for (const file of createFilesList) {
+                const content = await file.arrayBuffer();
+                zip.file(file.name, content);
+            }
+            
+            zip.generateAsync({ type: 'blob' }).then(function(blob) {
+                saveAs(blob, 'archive.zip');
+                showStatus('ZIP file created successfully!', 'success');
+            });
+        }
+        
+        // Handle extract file
+        async function handleExtractFile(event) {
+            const file = event.target.files[0];
+            if (!file || !file.name.endsWith('.zip')) {
+                showStatus('Please select a valid ZIP file', 'error');
+                return;
+            }
+            
+            try {
+                extractedZip = await JSZip.loadAsync(file);
+                displayExtractedFiles();
+                document.getElementById('extractAllBtn').disabled = false;
+            } catch (error) {
+                showStatus('Error reading ZIP file', 'error');
+                console.error(error);
+            }
+        }
+        
+        function displayExtractedFiles() {
+            const container = document.getElementById('extractFileItems');
+            const fileList = document.getElementById('extractFileList');
+            
+            fileList.style.display = 'block';
+            container.innerHTML = '';
+            
+            extractedZip.forEach((relativePath, file) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <i class="fas ${file.dir ? 'fa-folder' : 'fa-file'} file-icon"></i>
+                        <div>
+                            <div class="file-name">${relativePath}</div>
+                            <div class="file-size">${file.dir ? 'Folder' : 'File'}</div>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        ${!file.dir ? `<button class="action-btn" onclick="extractSingleFile('${relativePath}')">
+                            <i class="fas fa-download"></i>
+                        </button>` : ''}
+                    </div>
+                `;
+                container.appendChild(fileItem);
+            });
+        }
+        
+        async function extractSingleFile(path) {
+            const file = extractedZip.file(path);
+            if (file) {
+                const blob = await file.async('blob');
+                saveAs(blob, path.split('/').pop());
+                showStatus(`Extracted: ${path}`, 'success');
+            }
+        }
+        
+        async function extractAll() {
+            for (const [relativePath, file] of Object.entries(extractedZip.files)) {
+                if (!file.dir) {
+                    const blob = await file.async('blob');
+                    saveAs(blob, relativePath);
+                }
+            }
+            showStatus('All files extracted successfully!', 'success');
+        }
+        
+        function clearExtractFiles() {
+            extractedZip = null;
+            document.getElementById('extractFileList').style.display = 'none';
+            document.getElementById('extractAllBtn').disabled = true;
+            document.getElementById('extractFile').value = '';
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+        
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.className = `status-message ${type}`;
+            statusEl.textContent = message;
+            setTimeout(() => {
+                statusEl.className = 'status-message';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

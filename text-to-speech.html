@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #06d6a0;
+            --dark: #1e1e2c;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --warning: #ffd166;
+            --border: #e2e8f0;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .tool-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            padding: 30px;
+        }
+        .input-section {
+            margin-bottom: 30px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: var(--transition);
+        }
+        textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .voice-controls {
+            display: flex;
+            gap: 15px;
+            flex: 1;
+            min-width: 300px;
+        }
+        select {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 1rem;
+        }
+        .rate-control, .pitch-control {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+        .slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #e2e8f0;
+            border-radius: 4px;
+            outline: none;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .slider-value {
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            justify-content: center;
+        }
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-play {
+            background: var(--secondary);
+        }
+        .btn-play:hover {
+            background: #05b38a;
+        }
+        .btn-stop {
+            background: #ff6b6b;
+        }
+        .btn-stop:hover {
+            background: #ff5252;
+        }
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            min-height: 24px;
+            color: var(--gray);
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        .speaker-icon {
+            font-size: 24px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            margin: 0 auto 20px;
+        }
+        .ad-space {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90px;
+            margin: 32px 0 32px 0;
+        }
+        .piki-ads {
+            display: block;
+            width: 728px;
+            height: 90px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 90px;
+            box-shadow: 0 2px 16px rgba(67,97,238,0.08);
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .piki-ads:hover {
+            background: var(--secondary);
+            color: #fff;
+        }
+        @media (max-width: 800px) {
+            .piki-ads {
+                width: 100%;
+                min-width: 0;
+                font-size: 1.05rem;
+                line-height: 2.5rem;
+                height: auto;
+                padding: 1.2rem 0;
+            }
+            .ad-space {
+                min-height: 0;
+                margin: 24px 0 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Text to Speech</h1>
+            <p>Convert your text to natural-sounding speech in your browser.</p>
+        </header>
+        <div class="ad-space">
+          <a class='piki-ads' href="javascript:;">Your Responsive Ads code (Google Ads)</a>
+        </div>
+        <div class="tool-card">
+            <div class="speaker-icon">
+                <i class="fas fa-volume-up"></i>
+            </div>
+            <div class="input-section">
+                <textarea id="textInput" placeholder="Enter text to convert to speech...">Hello! Welcome to the text to speech converter. You can enter any text here and listen to it being spoken.</textarea>
+            </div>
+            <div class="controls">
+                <div class="voice-controls">
+                    <select id="voiceSelect"></select>
+                    <div class="rate-control">
+                        <label for="rate">Speed: <span id="rateValue">1.0</span></label>
+                        <input type="range" min="0.5" max="2" value="1" step="0.1" id="rate" class="slider">
+                    </div>
+                    <div class="pitch-control">
+                        <label for="pitch">Pitch: <span id="pitchValue">1.0</span></label>
+                        <input type="range" min="0.1" max="2" value="1" step="0.1" id="pitch" class="slider">
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-play" id="speakBtn">
+                    <i class="fas fa-play"></i> Speak
+                </button>
+                <button class="btn btn-stop" id="stopBtn" disabled>
+                    <i class="fas fa-stop"></i> Stop
+                </button>
+                <button class="btn" id="clearBtn">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+            </div>
+            <div class="status" id="status">
+                Ready to convert text to speech
+            </div>
+        </div>
+        <footer>
+            <p>Text to Speech &copy; 2023 | All processing happens locally in your browser</p>
+        </footer>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textInput = document.getElementById('textInput');
+            const voiceSelect = document.getElementById('voiceSelect');
+            const rateInput = document.getElementById('rate');
+            const rateValue = document.getElementById('rateValue');
+            const pitchInput = document.getElementById('pitch');
+            const pitchValue = document.getElementById('pitchValue');
+            const speakBtn = document.getElementById('speakBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const status = document.getElementById('status');
+            let speechSynthesis = window.speechSynthesis;
+            let voices = [];
+            let isSpeaking = false;
+            // Populate voices
+            function loadVoices() {
+                voices = speechSynthesis.getVoices();
+                voiceSelect.innerHTML = '';
+                voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    if (voice.default) {
+                        option.textContent += ' — DEFAULT';
+                        option.selected = true;
+                    }
+                    voiceSelect.appendChild(option);
+                });
+            }
+            // Initialize voices
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+            }
+            // Event handlers
+            rateInput.addEventListener('input', () => {
+                rateValue.textContent = rateInput.value;
+            });
+            pitchInput.addEventListener('input', () => {
+                pitchValue.textContent = pitchInput.value;
+            });
+            speakBtn.addEventListener('click', () => {
+                if (isSpeaking) {
+                    speechSynthesis.cancel();
+                    return;
+                }
+                if (textInput.value.trim() === '') {
+                    status.textContent = 'Please enter some text first';
+                    return;
+                }
+                const utterance = new SpeechSynthesisUtterance(textInput.value);
+                const selectedVoice = voiceSelect.selectedOptions[0].value;
+                utterance.voice = voices.find(voice => voice.name === selectedVoice);
+                utterance.rate = parseFloat(rateInput.value);
+                utterance.pitch = parseFloat(pitchInput.value);
+                utterance.onstart = function() {
+                    isSpeaking = true;
+                    status.textContent = 'Speaking...';
+                    speakBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                    stopBtn.disabled = false;
+                };
+                utterance.onend = function() {
+                    isSpeaking = false;
+                    status.textContent = 'Finished speaking';
+                    speakBtn.innerHTML = '<i class="fas fa-play"></i> Speak';
+                    stopBtn.disabled = true;
+                };
+                utterance.onerror = function() {
+                    isSpeaking = false;
+                    status.textContent = 'Error occurred during speech synthesis';
+                    speakBtn.innerHTML = '<i class="fas fa-play"></i> Speak';
+                    stopBtn.disabled = true;
+                };
+                speechSynthesis.speak(utterance);
+            });
+            stopBtn.addEventListener('click', () => {
+                speechSynthesis.cancel();
+                isSpeaking = false;
+                status.textContent = 'Speech stopped';
+                speakBtn.innerHTML = '<i class="fas fa-play"></i> Speak';
+                stopBtn.disabled = true;
+            });
+            clearBtn.addEventListener('click', () => {
+                textInput.value = '';
+                status.textContent = 'Text cleared. Ready to convert text to speech';
+            });
+        });
+    </script>
+</body>
+</html> 

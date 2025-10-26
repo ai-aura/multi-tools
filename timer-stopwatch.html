@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoFlow - Modern Timer & Stopwatch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #f72585;
+            --dark: #1e1e2c;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --success: #4cc9f0;
+            --border: #e2e8f0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .app-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            animation: slideUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .tabs {
+            display: flex;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 18px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--gray);
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .display-container {
+            position: relative;
+            margin: 0 auto 30px;
+            width: 300px;
+            height: 300px;
+        }
+
+        .progress-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            stroke: var(--primary);
+            stroke-width: 8;
+            fill: transparent;
+            stroke-dasharray: 880;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .time-display {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .time {
+            font-size: 3.5rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--dark);
+            margin-bottom: 5px;
+            letter-spacing: -2px;
+        }
+
+        .mode-indicator {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-reset {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--border);
+            box-shadow: none;
+        }
+
+        .btn-reset:hover {
+            background: #f8f9fa;
+            border-color: var(--primary);
+        }
+
+        .btn-stop {
+            background: var(--secondary);
+            box-shadow: 0 4px 12px rgba(247, 37, 133, 0.25);
+        }
+
+        .btn-stop:hover {
+            background: #e11571;
+            box-shadow: 0 6px 15px rgba(247, 37, 133, 0.3);
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .time-input {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 80px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .time-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .colon {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray);
+        }
+
+        .lap-section {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: var(--radius);
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        .lap-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 15px 10px;
+            font-weight: 600;
+            color: var(--gray);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 10px;
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+        }
+
+        .lap-list {
+            list-style: none;
+        }
+
+        .lap-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .lap-item:nth-child(odd) {
+            background: rgba(67, 97, 238, 0.03);
+        }
+
+        .lap-number {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .lap-time {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .lap-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 5px 0;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .display-container {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .time {
+                font-size: 3rem;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 0.95rem;
+            }
+            
+            .time-input {
+                width: 65px;
+                padding: 8px 12px;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .display-container {
+                width: 220px;
+                height: 220px;
+            }
+            
+            .time {
+                font-size: 2.5rem;
+            }
+            
+            .controls {
+                gap: 10px;
+            }
+            
+            .btn {
+                padding: 10px 16px;
+            }
+        }
+
+        .ad-space {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90px;
+            margin: 32px 0 32px 0;
+        }
+        .piki-ads {
+            display: block;
+            width: 728px;
+            height: 90px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 90px;
+            box-shadow: 0 2px 16px rgba(67,97,238,0.08);
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .piki-ads:hover {
+            background: var(--secondary);
+            color: #fff;
+        }
+        @media (max-width: 800px) {
+            .piki-ads {
+                width: 100%;
+                min-width: 0;
+                font-size: 1.05rem;
+                line-height: 2.5rem;
+                height: auto;
+                padding: 1.2rem 0;
+            }
+            .ad-space {
+                min-height: 0;
+                margin: 24px 0 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ChronoFlow - Modern Timer & Stopwatch</h1>
+            <p>Modern, beautiful timer and stopwatch for productivity and workouts.</p>
+        </header>
+        <div class="ad-space">
+          <a class='piki-ads' href="javascript:;">Your Responsive Ads code (Google Ads)</a>
+        </div>
+
+        <div class="app-card">
+            <div class="tabs">
+                <div class="tab active" data-tab="timer">Timer</div>
+                <div class="tab" data-tab="stopwatch">Stopwatch</div>
+            </div>
+            
+            <div class="content">
+                <!-- Timer Section -->
+                <div id="timer-section">
+                    <div class="display-container">
+                        <svg class="progress-ring" width="300" height="300">
+                            <circle class="progress-ring-circle" stroke="#e2e8f0" stroke-width="8" fill="transparent" r="140" cx="150" cy="150"/>
+                            <circle class="progress-ring-circle progress-indicator" stroke="#4361ee" stroke-width="8" fill="transparent" r="140" cx="150" cy="150" stroke-dashoffset="0"/>
+                        </svg>
+                        <div class="time-display">
+                            <div class="time" id="timer-display">25:00</div>
+                            <div class="mode-indicator">TIMER</div>
+                        </div>
+                    </div>
+                    
+                    <div class="timer-controls">
+                        <input type="number" class="time-input" id="minutes" min="0" max="99" value="25">
+                        <div class="colon">:</div>
+                        <input type="number" class="time-input" id="seconds" min="0" max="59" value="0">
+                    </div>
+                    
+                    <div class="controls">
+                        <button class="btn" id="timer-start">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <button class="btn btn-reset" id="timer-reset">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Stopwatch Section -->
+                <div id="stopwatch-section" class="hidden">
+                    <div class="display-container">
+                        <svg class="progress-ring" width="300" height="300">
+                            <circle class="progress-ring-circle" stroke="#e2e8f0" stroke-width="8" fill="transparent" r="140" cx="150" cy="150"/>
+                            <circle class="progress-ring-circle progress-indicator" stroke="#f72585" stroke-width="8" fill="transparent" r="140" cx="150" cy="150" stroke-dashoffset="0"/>
+                        </svg>
+                        <div class="time-display">
+                            <div class="time" id="stopwatch-display">00:00.00</div>
+                            <div class="mode-indicator">STOPWATCH</div>
+                        </div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button class="btn" id="stopwatch-start">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <button class="btn btn-stop" id="stopwatch-lap" disabled>
+                            <i class="fas fa-flag"></i> Lap
+                        </button>
+                        <button class="btn btn-reset" id="stopwatch-reset" disabled>
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                    
+                    <div class="lap-section">
+                        <div class="lap-header">
+                            <span>Lap</span>
+                            <span>Time</span>
+                        </div>
+                        <ul class="lap-list" id="lap-list">
+                            <!-- Lap times will be added here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>ChronoFlow &copy; 2023 | Modern Timer & Stopwatch Tool</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const timerTab = document.querySelector('[data-tab="timer"]');
+            const stopwatchTab = document.querySelector('[data-tab="stopwatch"]');
+            const timerSection = document.getElementById('timer-section');
+            const stopwatchSection = document.getElementById('stopwatch-section');
+            
+            // Timer elements
+            const timerDisplay = document.getElementById('timer-display');
+            const minutesInput = document.getElementById('minutes');
+            const secondsInput = document.getElementById('seconds');
+            const timerStartBtn = document.getElementById('timer-start');
+            const timerResetBtn = document.getElementById('timer-reset');
+            const timerProgress = document.querySelector('#timer-section .progress-indicator');
+            
+            // Stopwatch elements
+            const stopwatchDisplay = document.getElementById('stopwatch-display');
+            const stopwatchStartBtn = document.getElementById('stopwatch-start');
+            const stopwatchLapBtn = document.getElementById('stopwatch-lap');
+            const stopwatchResetBtn = document.getElementById('stopwatch-reset');
+            const lapList = document.getElementById('lap-list');
+            const stopwatchProgress = document.querySelector('#stopwatch-section .progress-indicator');
+            
+            // State variables
+            let currentTab = 'timer';
+            let timerInterval = null;
+            let stopwatchInterval = null;
+            let timerRunning = false;
+            let stopwatchRunning = false;
+            let timerDuration = 25 * 60; // 25 minutes in seconds
+            let timerRemaining = timerDuration;
+            let stopwatchTime = 0;
+            let lapCount = 1;
+            
+            // Tab switching
+            timerTab.addEventListener('click', () => switchTab('timer'));
+            stopwatchTab.addEventListener('click', () => switchTab('stopwatch'));
+            
+            function switchTab(tab) {
+                if (tab === currentTab) return;
+                
+                currentTab = tab;
+                
+                // Update UI
+                timerTab.classList.toggle('active', tab === 'timer');
+                stopwatchTab.classList.toggle('active', tab === 'stopwatch');
+                timerSection.classList.toggle('hidden', tab !== 'timer');
+                stopwatchSection.classList.toggle('hidden', tab !== 'stopwatch');
+                
+                // Reset animations
+                if (tab === 'timer') {
+                    updateTimerProgress();
+                } else {
+                    updateStopwatchProgress();
+                }
+            }
+            
+            // Timer functionality
+            function startTimer() {
+                if (timerRunning) return;
+                
+                // Calculate total seconds from inputs
+                const minutes = parseInt(minutesInput.value) || 0;
+                const seconds = parseInt(secondsInput.value) || 0;
+                timerDuration = minutes * 60 + seconds;
+                
+                if (timerDuration <= 0) {
+                    alert('Please set a valid time');
+                    return;
+                }
+                
+                timerRemaining = timerDuration;
+                timerRunning = true;
+                timerStartBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                timerStartBtn.classList.add('pulse');
+                
+                // Disable inputs during timer
+                minutesInput.disabled = true;
+                secondsInput.disabled = true;
+                
+                // Update display initially
+                updateTimerDisplay();
+                
+                // Start interval
+                timerInterval = setInterval(() => {
+                    timerRemaining--;
+                    updateTimerDisplay();
+                    
+                    if (timerRemaining <= 0) {
+                        clearInterval(timerInterval);
+                        timerRunning = false;
+                        timerStartBtn.innerHTML = '<i class="fas fa-play"></i> Start';
+                        timerStartBtn.classList.remove('pulse');
+                        playCompletionSound();
+                    }
+                }, 1000);
+            }
+            
+            function pauseTimer() {
+                clearInterval(timerInterval);
+                timerRunning = false;
+                timerStartBtn.innerHTML = '<i class="fas fa-play"></i> Resume';
+                timerStartBtn.classList.remove('pulse');
+            }
+            
+            function resetTimer() {
+                clearInterval(timerInterval);
+                timerRunning = false;
+                timerStartBtn.innerHTML = '<i class="fas fa-play"></i> Start';
+                timerStartBtn.classList.remove('pulse');
+                
+                // Reset to initial values
+                minutesInput.disabled = false;
+                secondsInput.disabled = false;
+                minutesInput.value = '25';
+                secondsInput.value = '0';
+                timerDuration = 25 * 60;
+                timerRemaining = timerDuration;
+                updateTimerDisplay();
+            }
+            
+            function updateTimerDisplay() {
+                const minutes = Math.floor(timerRemaining / 60);
+                const seconds = timerRemaining % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                updateTimerProgress();
+            }
+            
+            function updateTimerProgress() {
+                const circumference = 880; // 2 * π * r (r=140)
+                const offset = circumference - (timerRemaining / timerDuration) * circumference;
+                timerProgress.style.strokeDashoffset = offset;
+            }
+            
+            // Stopwatch functionality
+            function startStopwatch() {
+                if (stopwatchRunning) {
+                    pauseStopwatch();
+                    return;
+                }
+                
+                stopwatchRunning = true;
+                stopwatchStartBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                stopwatchStartBtn.classList.add('pulse');
+                stopwatchLapBtn.disabled = false;
+                stopwatchResetBtn.disabled = false;
+                
+                const startTime = Date.now() - stopwatchTime;
+                
+                stopwatchInterval = setInterval(() => {
+                    stopwatchTime = Date.now() - startTime;
+                    updateStopwatchDisplay();
+                }, 10);
+            }
+            
+            function pauseStopwatch() {
+                clearInterval(stopwatchInterval);
+                stopwatchRunning = false;
+                stopwatchStartBtn.innerHTML = '<i class="fas fa-play"></i> Resume';
+                stopwatchStartBtn.classList.remove('pulse');
+            }
+            
+            function resetStopwatch() {
+                clearInterval(stopwatchInterval);
+                stopwatchRunning = false;
+                stopwatchTime = 0;
+                lapCount = 1;
+                
+                stopwatchStartBtn.innerHTML = '<i class="fas fa-play"></i> Start';
+                stopwatchStartBtn.classList.remove('pulse');
+                stopwatchLapBtn.disabled = true;
+                stopwatchResetBtn.disabled = true;
+                
+                updateStopwatchDisplay();
+                lapList.innerHTML = '';
+            }
+            
+            function recordLap() {
+                if (!stopwatchRunning) return;
+                
+                const lapTime = document.createElement('li');
+                lapTime.className = 'lap-item';
+                
+                const lapNumber = document.createElement('span');
+                lapNumber.className = 'lap-number';
+                lapNumber.textContent = `Lap ${lapCount}`;
+                
+                const lapTimeValue = document.createElement('span');
+                lapTimeValue.className = 'lap-time';
+                lapTimeValue.textContent = formatStopwatchTime(stopwatchTime);
+                
+                lapTime.appendChild(lapNumber);
+                lapTime.appendChild(lapTimeValue);
+                
+                // Add divider if not the first lap
+                if (lapCount > 1) {
+                    const divider = document.createElement('li');
+                    divider.className = 'lap-divider';
+                    lapList.prepend(divider);
+                }
+                
+                lapList.prepend(lapTime);
+                lapCount++;
+                
+                // Play lap sound
+                playLapSound();
+            }
+            
+            function updateStopwatchDisplay() {
+                stopwatchDisplay.textContent = formatStopwatchTime(stopwatchTime);
+                updateStopwatchProgress();
+            }
+            
+            function updateStopwatchProgress() {
+                const circumference = 880;
+                // Progress based on minutes (60 min max)
+                const progress = (stopwatchTime / (60 * 60 * 1000)) * 100;
+                const offset = circumference - (Math.min(progress, 100) / 100) * circumference;
+                stopwatchProgress.style.strokeDashoffset = offset;
+            }
+            
+            function formatStopwatchTime(time) {
+                const totalSeconds = Math.floor(time / 1000);
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                const milliseconds = Math.floor((time % 1000) / 10);
+                
+                return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
+            }
+            
+            // Sound functions
+            function playCompletionSound() {
+                // In a real app, we would play an actual sound
+                // For this demo, we'll just show a visual effect
+                timerDisplay.classList.add('pulse');
+                timerDisplay.style.color = 'var(--secondary)';
+                
+                setTimeout(() => {
+                    timerDisplay.classList.remove('pulse');
+                    timerDisplay.style.color = '';
+                }, 2000);
+            }
+            
+            function playLapSound() {
+                // Visual feedback for lap
+                stopwatchDisplay.classList.add('pulse');
+                
+                setTimeout(() => {
+                    stopwatchDisplay.classList.remove('pulse');
+                }, 300);
+            }
+            
+            // Event listeners
+            timerStartBtn.addEventListener('click', function() {
+                if (timerRunning) {
+                    pauseTimer();
+                } else {
+                    startTimer();
+                }
+            });
+            
+            timerResetBtn.addEventListener('click', resetTimer);
+            
+            stopwatchStartBtn.addEventListener('click', startStopwatch);
+            stopwatchLapBtn.addEventListener('click', recordLap);
+            stopwatchResetBtn.addEventListener('click', resetStopwatch);
+            
+            // Input validation
+            minutesInput.addEventListener('change', function() {
+                let value = parseInt(this.value) || 0;
+                if (value < 0) value = 0;
+                if (value > 99) value = 99;
+                this.value = value;
+            });
+            
+            secondsInput.addEventListener('change', function() {
+                let value = parseInt(this.value) || 0;
+                if (value < 0) value = 0;
+                if (value > 59) value = 59;
+                this.value = value;
+            });
+            
+            // Initialize displays
+            updateTimerDisplay();
+            updateStopwatchDisplay();
+        });
+    </script>
+</body>
+</html> 
